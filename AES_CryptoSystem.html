@@ -1,0 +1,135 @@
+<!-- 
+    AES javascript document:
+https://www.npmjs.com/package/aes-js
+ -->
+
+
+ <!DOCTYPE html>
+<html>
+<body>
+
+<h2>AES cryptosystem</h2>
+
+<h3>AES Encryption</h3>
+
+plaintext: <input id="plaintext" size="40" placeholder="Please enter string"  />
+<br/>
+key: <input id="key" size="40" placeholder="Please enter hexadecimal" />
+<br/><br/>
+<button type="button" onclick="encrypt()">Encrypt</button>
+<br/><br/>
+Encrypted result: <div id="encryptedresult"/></div>
+<br/>
+
+<h3>AES Decryption</h3>
+
+ciphertext: <input id="ciphertext" size="40" placeholder="Please enter encrypted result"/>
+<br/>
+key: <input id="key1" size="40" placeholder="Please enter hexadecimal"/>
+<br/><br/>
+<button type="button" onclick="decrypt()">Decrypt</button>
+<br/><br/>
+Decrypted result: <div id="decryptedresult"/></div>
+<br/>
+
+<script src="aes.js"></script>
+
+<script>
+
+function encrypt(){
+    
+    // get user input plaintext as hex string
+    var plaintext = document.getElementById('plaintext').value;
+    // check length of plaintext
+    //          p.g. 1 byte = 2 hex digit
+    if(plaintext.length%32!=0){
+        alert("Your entered plaintext is "+plaintext.length/2+" bytes!\n\n"+" The length of plaintext must be a multiple of 16 bytes (16 ascii text characters)!\n\nPlease re-enter the plaintext!");
+        return false;
+    }
+
+    // get user entered key
+    var key = document.getElementById('key').value;
+    // check length of key
+    //          p.g. 1 byte = 2 hex digit
+    if(key.length%64!=0){
+       alert("Your entered key is "+key.length/2+" bytes!\n\n"+" The length of key must be a multiple of 32 bytes (64 Hex digits)!\n\nPlease re-enter the key!");
+       return false;
+    }
+
+    final_output = aes_ecb_encryption(plaintext, key);
+
+    // print the final output on the page
+    document.getElementById("encryptedresult").innerHTML = final_output;
+}
+// 2 inputs:
+//       plaintext is a HEX string
+//       key is a HEX string
+// 1 output:
+//       ciphertext is HEX string
+function aes_ecb_encryption(plaintext, key){
+    // Convert hex to bytes
+    //   using aesjs.utils.hex.toBytes (function in the aes library)
+    plaintext = aesjs.utils.utf8.toBytes(plaintext);
+    key = aesjs.utils.hex.toBytes(key);
+    
+    // AES_EBC encryption
+    //    functions in the aes libraray
+    //        can only accept key as Bytes
+    var AES_ECB = new aesjs.ModeOfOperation.ecb(key);
+    //        can only accept plaintext as bytes
+    //        return result is also in bytes
+    var encrypted_in_bytes = AES_ECB.encrypt(plaintext);
+
+    // convert encrypted_in_bytes back to hex
+    //      using aesjs.utils.hex.fromBytes (function in the aes library)
+    var ciphertext = aesjs.utils.hex.fromBytes(encrypted_in_bytes);
+
+    // return a HEX ciphertext
+    return ciphertext;
+}
+
+function decrypt(){
+    
+    // get user input plaintext as hex string
+    var ciphertext = document.getElementById('ciphertext').value;
+
+    // get user entered key
+    var key = document.getElementById('key1').value;
+    // check length of key
+    //          p.g. 1 byte = 2 hex digit
+    if(key.length%64!=0){
+       alert("Your entered key is "+key.length/2+" bytes!\n\n"+" The length of key must be a multiple of 32 bytes (64 HEX Digits)!\n\nPlease re-enter the key!");
+       return false;
+    }
+
+    final_output = aes_ecb_decryption(ciphertext, key);
+
+    // print the final output on the page
+    document.getElementById("decryptedresult").innerHTML = final_output;
+}
+
+function aes_ecb_decryption(ciphertext, key){
+    // Convert hex to bytes
+    //   using aesjs.utils.hex.toBytes (function in the aes library)
+    ciphertext = aesjs.utils.hex.toBytes(ciphertext);
+    key = aesjs.utils.hex.toBytes(key);
+    
+    // AES_EBC encryption
+    //    functions in the aes libraray
+    //        can only accept key as Bytes
+    var AES_ECB = new aesjs.ModeOfOperation.ecb(key);
+    //        can only accept plaintext as bytes
+    //        return result is also in bytes
+    var decrypted_in_bytes = AES_ECB.decrypt(ciphertext);
+
+    // convert encrypted_in_bytes back to hex
+    //      using aesjs.utils.hex.fromBytes (function in the aes library)
+
+    // return a HEX ciphertext
+    var decryptedtext = aesjs.utils.utf8.fromBytes(decrypted_in_bytes);
+    return decryptedtext;
+}
+</script>
+
+</body>
+</html>
